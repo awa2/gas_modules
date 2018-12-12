@@ -2,7 +2,7 @@
 Utility modules for Google Apps Script with TypeScript
 
 ## AutoFolderingApp
-Making annualy or monthly named folder in your Goolge Drive such as below:
+Making annualy or monthly named folder on your Goolge Drive such as below:
 ```
 RootFolder
  |- 2017
@@ -24,3 +24,12 @@ console.log(LogFolder.getId());
 ```
 
 ## NotificationApp
+Notify by Slack, Gmail and Workplaces.
+
+## HTTP
+Handle HTTP request and response on Google Apps Script.
+HTTP module provides Express like Request object and response object.(Only GET and POST methods.)
+
+## Table
+Handle Spreadsheet like as database.
+Table module provides CRUD like interface and JSON based data handling with Google Spreadsheet.
