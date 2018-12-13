@@ -12,6 +12,12 @@ export default class NotificationApp {
     }
 
     public notify(option: NotificationOption) {
+        this.notifyToEmail(option);
+        this.notifyToSlack(option);
+        this.log(option);
+    }
+
+    public notifyToEmail(option: NotificationOption){
         const attach = option.attachments[0];
         let htmlBody = '';
 
@@ -35,9 +41,14 @@ export default class NotificationApp {
             htmlBody: htmlBody,
             noReply: true
         });
-        this.Slack.postMessage(this.ch, '', { username: this.name, attachments: JSON.stringify(option.attachments) });
+    }
 
-        this.log(option);
+    public notifyToSlack(option: NotificationOption, channel? : string){
+        if(channel){
+            this.Slack.postMessage(channel, '', { username: this.name, attachments: JSON.stringify(option.attachments) });
+        } else {
+            this.Slack.postMessage(this.ch, '', { username: this.name, attachments: JSON.stringify(option.attachments) });
+        }
     }
 
     public log(option: NotificationOption){
