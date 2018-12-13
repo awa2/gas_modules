@@ -32,6 +32,7 @@ export class EventRequest {
     public email: string;
     public responses: EventObject.FormResponse[];
     constructor(e: EventObject.Spreadsheet.onSubmit | EventObject.Form.onSubmit, asNames: string[]) {
+        this.body = {};
         if (e['response']) {
             const event = e as EventObject.Form.onSubmit;
             this.email = event.response.getRespondentEmail();
