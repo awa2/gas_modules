@@ -14,7 +14,7 @@ export default class NotificationApp {
     public notify(option: NotificationOption) {
         const attach = option.attachments[0];
         let htmlBody = '';
-        htmlBody = attach.text ? `<p>${attach.pretext}</p>\n` : '';
+        htmlBody = attach.pretext ? `<p>${attach.pretext.replace('\n','<br>')}</p>\n` : '';
         if (attach.author_name) {
             htmlBody += attach.author_link ? `<small><a href="${attach.author_link}">${attach.author_name}</a></small>` : `<small><${attach.author_name}</small>`;
         }
