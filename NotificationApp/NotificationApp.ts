@@ -29,8 +29,8 @@ export default class NotificationApp {
         htmlBody += attach.text ? `<p>${attach.text.replace('\n','<br>\n')}</p>` : '';
         if (attach.fields) {
             htmlBody += attach.fields.map(field => {
-                return `<p><b>${field.title}</b><br>/n${field.value}</p>`;
-            }).join('/n');
+                return `<p><b>${field.title}</b><br>\n${field.value}</p>`;
+            }).join('\n');
         }
         htmlBody += attach.footer ? `<small>${attach.footer.replace('\n','<br>\n')}</small>\n` : '';
 
