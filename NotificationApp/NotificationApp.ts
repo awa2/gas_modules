@@ -21,18 +21,18 @@ export default class NotificationApp {
         const attach = option.attachments[0];
         let htmlBody = '';
 
-        htmlBody = attach.pretext ? `<p>${attach.pretext.replace('\n','<br>\n')}</p>\n` : '';
+        htmlBody = attach.pretext ? `<p>${attach.pretext.replace('/n','<br>/n')}</p>/n` : '';
         if (attach.author_name) {
             htmlBody += attach.author_link ? `<small><a href="${attach.author_link}">${attach.author_name}</a></small>` : `<small><${attach.author_name}</small>`;
         }
         htmlBody += `<h2>${attach.title}</h2>`;
-        htmlBody += attach.text ? `<p>${attach.text.replace('\n','<br>\n')}</p>` : '';
+        htmlBody += attach.text ? `<p>${attach.text.replace('/n','<br>/n')}</p>` : '';
         if (attach.fields) {
             htmlBody += attach.fields.map(field => {
                 return `<p><b>${field.title}</b><br>/n${field.value}</p>`;
             }).join('/n');
         }
-        htmlBody += attach.footer ? `<small>${attach.footer.replace('\n','<br>\n')}</small>\n` : '';
+        htmlBody += attach.footer ? `<small>${attach.footer.replace('/n','<br>/n')}</small>/n` : '';
 
         MailApp.sendEmail({
             to: option.to,
