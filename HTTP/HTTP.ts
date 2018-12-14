@@ -1,8 +1,8 @@
 export namespace EventObject {
     export type Request = {
         queryString?: string | null,
-        parameter?: Object
-        parameters?: {[key: string]: Array<Object>},
+        parameter?: { [key: string]: Object },
+        parameters?: { [key: string]: Array<Object> },
         contextPath?: string,
         contentLength?: number,
         postData?: {
@@ -15,13 +15,53 @@ export namespace EventObject {
 }
 
 export class Response {
+    private output : GoogleAppsScript.HTML.HtmlOutput | GoogleAppsScript.Content.TextOutput;
+    private mimetype : GoogleAppsScript.Content.MimeType | 'HTML';
     constructor() {
-
+        this.output = ContentService.createTextOutput();
+        this.mimetype = 'HTML';
     }
-    public json() { }
-    public type() { }
-    public render() { }
-    public send() { }
+    public json(json: Object) {
+        this.output = ContentService.createTextOutput(JSON.stringify(json));
+        this.output.setMimeType(GoogleAppsScript.Content.MimeType.JSON);
+        this.mimetype = GoogleAppsScript.Content.MimeType.JSON;
+        return this;
+    }
+    public render(filename: string, variable?: { [key: string]: Object }, title?: string) {
+        const template = HtmlService.createTemplateFromFile(filename);
+        if(variable){
+            for (const key in variable) {
+                if (variable.hasOwnProperty(key)) {
+                    template[key] = variable[key];
+                }
+            }
+        }
+        this.output = template.evaluate();
+        if(title){ this.output.setTitle(title); }
+        return this;
+    }
+    public type(type: GoogleAppsScript.Content.MimeType | 'HTML'){
+        this.mimetype = type;
+        return this;
+    }
+    public send(content: string | Object){
+        if(typeof content === 'string'){
+            if(this.mimetype === 'HTML'){
+                this.output = HtmlService.createHtmlOutput().setContent(content);
+            } else {
+                this.output = ContentService.createTextOutput(content);
+                this.output.setMimeType(this.mimetype);
+            }
+        } else {
+            return this.json(content as Object);
+        }
+    }
+    public end() {
+        return true;
+    }
+    public out(){
+        return this.output;
+    }
 }
 export class Request {
     // baseUrl? : string;
@@ -31,7 +71,7 @@ export class Request {
     // params : string;
     public path: string;
     public protocol: 'https';
-    public query: { [key: string]: any }
+    public query: { [key: string]: any } | undefined
 
     constructor(e: EventObject.Request) {
         if (e['postData']) {
@@ -54,6 +94,44 @@ export class Request {
     }
 
 }
-export function httpRequest(e: EventObject.Request) {
-    return new Request(e);
+export class WebApp {
+    private routes: {[method in 'GET'|'POST'] : { [key: string]: Object }[]};
+    private callbacks: {[method in 'GET'|'POST'] : Function[]};
+    constructor() {
+        this.routes = {GET : [] , POST : []};
+        this.callbacks = {GET : [] , POST : []};
+    }
+    public web(e: EventObject.Request) {
+        const req = new Request(e);
+        const res = new Response();
+        const ret : Object[] = [];
+
+        this.routes[req.method].some((route,i) => {
+            if (route && req.query) {
+                let route_is_matched = true;
+                for (const key in route) {
+                    route_is_matched = route_is_matched && (route[key] === req.query[key])
+                }
+                if(route_is_matched){
+                    const callback = this.callbacks[req.method][i];
+                    const result = callback(req, res);
+                    if(result === true){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
+        return res.out();
+    }
+    public get(path: { [key: string]: Object }, callback: Function) {
+        this.routes['GET'].push(path);
+        this.callbacks['GET'].push(callback);
+        return this;
+    }
+    public post(path: { [key: string]: Object }, callback: Function) {
+        this.routes['POST'].push(path);
+        this.callbacks['POST'].push(callback);
+        return this;
+    }
 }
