@@ -44,6 +44,10 @@ export default class NotificationApp {
     }
 
     public notifyToSlack(option: NotificationOption, channel? : string){
+        if(option.mention){
+            option.mention = option.mention.replace('@','');
+            if(option.attachments[0].pretext){ option.attachments[0].pretext += ` @${option.mention}`; }
+        }
         if(channel){
             this.Slack.postMessage(channel, '', { username: this.name, attachments: JSON.stringify(option.attachments) });
         } else {
