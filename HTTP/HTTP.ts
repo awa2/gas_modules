@@ -32,7 +32,7 @@ export class Response {
         if(variable){
             for (const key in variable) {
                 if (variable.hasOwnProperty(key)) {
-                    template[key] = variable[key];
+                    Object.defineProperty(template,key,variable[key]); // template[key] = variable[key];
                 }
             }
         }
