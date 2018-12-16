@@ -15,8 +15,8 @@ export namespace EventObject {
 }
 
 export class Response {
-    private output : GoogleAppsScript.HTML.HtmlOutput | GoogleAppsScript.Content.TextOutput;
-    private mimetype : GoogleAppsScript.Content.MimeType | 'HTML';
+    private output: GoogleAppsScript.HTML.HtmlOutput | GoogleAppsScript.Content.TextOutput;
+    private mimetype: GoogleAppsScript.Content.MimeType | 'HTML';
     constructor() {
         this.output = ContentService.createTextOutput();
         this.mimetype = 'HTML';
@@ -29,24 +29,24 @@ export class Response {
     }
     public render(filename: string, variable?: { [key: string]: Object }, title?: string) {
         const template = HtmlService.createTemplateFromFile(filename);
-        if(variable){
+        if (variable) {
             for (const key in variable) {
                 if (variable.hasOwnProperty(key)) {
-                    Object.defineProperty(template,key,variable[key]); // template[key] = variable[key];
+                    Object.defineProperty(template, key, variable[key]); // template[key] = variable[key];
                 }
             }
         }
         this.output = template.evaluate();
-        if(title){ this.output.setTitle(title); }
+        if (title) { this.output.setTitle(title); }
         return this;
     }
-    public type(type: GoogleAppsScript.Content.MimeType | 'HTML'){
+    public type(type: GoogleAppsScript.Content.MimeType | 'HTML') {
         this.mimetype = type;
         return this;
     }
-    public send(content: string | Object){
-        if(typeof content === 'string'){
-            if(this.mimetype === 'HTML'){
+    public send(content: string | Object) {
+        if (typeof content === 'string') {
+            if (this.mimetype === 'HTML') {
                 this.output = HtmlService.createHtmlOutput().setContent(content);
             } else {
                 this.output = ContentService.createTextOutput(content);
@@ -59,7 +59,7 @@ export class Response {
     public end() {
         return true;
     }
-    public out(){
+    public out() {
         return this.output;
     }
 }
@@ -95,27 +95,27 @@ export class Request {
 
 }
 export class WebApp {
-    private routes: {[method in 'GET'|'POST'] : { [key: string]: Object }[]};
-    private callbacks: {[method in 'GET'|'POST'] : Function[]};
+    private routes: { [method in 'GET' | 'POST']: { [key: string]: Object }[] };
+    private callbacks: { [method in 'GET' | 'POST']: Function[] };
     constructor() {
-        this.routes = {GET : [] , POST : []};
-        this.callbacks = {GET : [] , POST : []};
+        this.routes = { GET: [], POST: [] };
+        this.callbacks = { GET: [], POST: [] };
     }
     public web(e: EventObject.Request) {
         const req = new Request(e);
         const res = new Response();
-        const ret : Object[] = [];
+        const ret: Object[] = [];
 
-        this.routes[req.method].some((route,i) => {
+        this.routes[req.method].some((route, i) => {
             if (route && req.query) {
                 let route_is_matched = true;
                 for (const key in route) {
                     route_is_matched = route_is_matched && (route[key] === req.query[key])
                 }
-                if(route_is_matched){
+                if (route_is_matched) {
                     const callback = this.callbacks[req.method][i];
                     const result = callback(req, res);
-                    if(result === true){
+                    if (result === true) {
                         return true;
                     }
                 }
@@ -124,12 +124,12 @@ export class WebApp {
         });
         return res.out();
     }
-    public get(path: { [key: string]: Object }, callback: Function) {
+    public get(path: { [key: string]: Object }, callback: (req: Request, res: Response) => any) {
         this.routes['GET'].push(path);
         this.callbacks['GET'].push(callback);
         return this;
     }
-    public post(path: { [key: string]: Object }, callback: Function) {
+    public post(path: { [key: string]: Object }, callback: (req: Request, res: Response) => any) {
         this.routes['POST'].push(path);
         this.callbacks['POST'].push(callback);
         return this;
