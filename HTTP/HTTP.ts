@@ -119,6 +119,14 @@ export class WebApp {
                         return true;
                     }
                 }
+            } else {
+                if(route === {}){
+                    const callback = this.callbacks[req.method][i];
+                    const result = callback(req, res);
+                    if (result === true) {
+                        return true;
+                    }
+                }
             }
             return false;
         });
