@@ -32,7 +32,8 @@ export class Response {
         if (variable) {
             for (const key in variable) {
                 if (variable.hasOwnProperty(key)) {
-                    Object.defineProperty(template, key, variable[key]); // template[key] = variable[key];
+                    // Object.defineProperty(template, key, variable[key]);
+                    template[key] = variable[key];
                 }
             }
         }
@@ -44,16 +45,20 @@ export class Response {
         this.mimetype = type;
         return this;
     }
-    public send(content: string | Object) {
-        if (typeof content === 'string') {
-            if (this.mimetype === 'HTML') {
-                this.output = HtmlService.createHtmlOutput().setContent(content);
+    public send(content?: string | Object) {
+        if(content){
+            if (typeof content === 'string') {
+                if (this.mimetype === 'HTML') {
+                    this.output = HtmlService.createHtmlOutput().setContent(content);
+                } else {
+                    this.output = ContentService.createTextOutput(content);
+                    this.output.setMimeType(this.mimetype);
+                }
             } else {
-                this.output = ContentService.createTextOutput(content);
-                this.output.setMimeType(this.mimetype);
+                return this.json(content as Object);
             }
         } else {
-            return this.json(content as Object);
+            return this.end();
         }
     }
     public end() {
@@ -65,7 +70,7 @@ export class Response {
 }
 export class Request {
     // baseUrl? : string;
-    public body?: string;
+    public body?: { [key: string]: any };
     public method: 'POST' | 'GET';
     public originUrl: string;
     // params : string;
@@ -107,7 +112,7 @@ export class WebApp {
         const ret: Object[] = [];
 
         this.routes[req.method].some((route, i) => {
-            if (route && req.query) {
+            if (route && (req.query !== {})) {
                 let route_is_matched = true;
                 for (const key in route) {
                     route_is_matched = route_is_matched && (route[key] === req.query[key])
@@ -120,7 +125,7 @@ export class WebApp {
                     }
                 }
             } else {
-                if(route === {}){
+                if (route === {}) {
                     const callback = this.callbacks[req.method][i];
                     const result = callback(req, res);
                     if (result === true) {
@@ -142,4 +147,16 @@ export class WebApp {
         this.callbacks['POST'].push(callback);
         return this;
     }
+}
+
+export function include(filename: string, params?: { [key: string]: Object }) {
+    var Template = HtmlService.createTemplateFromFile(filename);
+    if(params){
+        for (var key in params) {
+            if (params.hasOwnProperty(key)) {
+                Template[key] = params[key];
+            }
+        }
+    }
+    return Template.evaluate();
 }
