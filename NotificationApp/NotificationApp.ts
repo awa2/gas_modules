@@ -70,7 +70,22 @@ type NotificationOption = {
 
 type Attachements = Array<{
     fallback?: string,             //"Required plain-text summary of the attachment.",
+    callback_id?: string,          //"wopr_game",
     color: string,                 //"#2eb886",
+    attachment_type?: string,      //"default",
+    actions?: Array<{
+        name: string,
+        text: string,
+        style?: string,
+        type: string,
+        value: string,
+        confirm?:{
+            title: string,
+            text: string,
+            ok_text: string,
+            dismiss_Text: string,
+        }
+    }>,
     pretext?: string,              //"Optional text that appears above the attachment block",
     author_name: string,           //"Bobby Tables",
     author_link?: string,          //"http://flickr.com/bobby/",
