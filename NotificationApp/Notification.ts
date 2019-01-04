@@ -158,7 +158,7 @@ namespace Notification {
             if (attachment.fields) {
                 md += attachment.fields.map(field => {
                     return `**${field.title}**  \n${field.value}\n`;
-                }).join();
+                }).join('');
             }
             md += '\n';
             md += attachment.footer ? `----\n${attachment.footer.replace('\n', '  \n')}\n` : '';
@@ -172,7 +172,7 @@ namespace Notification {
             if (attachment.fields) {
                 chatpost += attachment.fields.map(field => {
                     return `# *${field.title}*\n${field.value}\n`;
-                }).join();
+                }).join('');
             }
             chatpost += attachment.title_link ? attachment.title_link : attachment.author_link ? attachment.author_link : '';
             chatpost += '\n';
