@@ -73,9 +73,16 @@ class EventStore {
     }
     public store(e: Object) {
         this.e = JSON.stringify(e);
+        PropertiesService.getUserProperties().setProperty(ScriptApp.getScriptId(),this.e);
     }
     public load() {
-        return JSON.parse(this.e);
+        const e = PropertiesService.getUserProperties().getProperty(ScriptApp.getScriptId());
+        if(e){
+            this.e = e;
+            return JSON.parse(e);
+        } else {
+            return {};
+        }
     }
 }
 
