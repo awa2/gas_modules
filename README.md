@@ -33,3 +33,40 @@ HTTP module provides Express like Request object and response object.(Only GET a
 ## Table
 Handle Spreadsheet like as database.
 Table module provides CRUD like interface and JSON based data handling with Google Spreadsheet.
+
+### Example
+```TypeScript
+const Users = new Table('<YOUR_SPREADSHEET_ID>',123456);
+Users.add({ name : 'John Smith', age : 20});
+
+const user = Users.get(1);
+user.age = 21;
+Users.update(user);
+```
+
+## Process
+Process module provides Google Apps Script process and env service.
+### Env
+You can handle ScriptProperty like as `process.env` of nodejs.
+```TypeScript
+import process from './Process/Process';
+
+const token = process.env['TOKEN'];
+// it means below:
+// const token = PropertiesService.getScriptProperties().getProperty('TOKEN')
+```
+### Event store
+Event store method can store `EventObject` in order to test.
+```TypeScript
+import process from './Process/Process';
+
+function doGet(e){
+    process.event.store(e);
+    return callback(e);
+}
+
+function test_doGet(){
+    const e = process.event.load();
+    return callback(e);
+}
+```
