@@ -28,16 +28,16 @@ export class Response {
         return this;
     }
     public render(filename: string, variable?: { [key: string]: Object }, title?: string) {
-        const template = HtmlService.createTemplateFromFile(filename);
+        const Template = HtmlService.createTemplateFromFile(filename);
         if (variable) {
             for (const key in variable) {
                 if (variable.hasOwnProperty(key)) {
-                    // Object.defineProperty(template, key, variable[key]);
-                    template[key] = variable[key];
+                    // Object.defineProperty(Template, key, variable[key]);
+                    (Template as {[key: string]: any})[key] = variable[key];
                 }
             }
         }
-        this.output = template.evaluate();
+        this.output = Template.evaluate();
         if (title) { this.output.setTitle(title); }
         return this;
     }
@@ -84,6 +84,16 @@ export class Request {
                 case 'application/json':
                     this.body = JSON.parse(e.postData.contents);
                     break;
+                case 'application/x-www-form-urlencoded':
+                    const body: { [key: string]: any } = {};
+                    const qs = e.postData.contents.split('&');
+                    qs.forEach(q =>{
+                        const key = q.split('=')[0];
+                        const val = q.split('=')[1];
+                        body[key] = val;
+                    });
+                    this.body = body;
+                    break;
                 default:
                     this.body = undefined;
                     break;
@@ -112,7 +122,7 @@ export class WebApp {
         const ret: Object[] = [];
 
         this.routes[req.method].some((route, i) => {
-            if (route && (req.query !== {})) {
+            if (route && (req.query !== {}) && (req.query !== undefined)) {
                 let route_is_matched = true;
                 for (const key in route) {
                     route_is_matched = route_is_matched && (route[key] === req.query[key])
@@ -154,7 +164,7 @@ export function include(filename: string, params?: { [key: string]: Object }) {
     if(params){
         for (var key in params) {
             if (params.hasOwnProperty(key)) {
-                Template[key] = params[key];
+                (Template as {[key: string]: any})[key] = params[key];
             }
         }
     }
