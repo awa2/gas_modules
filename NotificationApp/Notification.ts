@@ -158,11 +158,10 @@ namespace Notification {
             if (attachment.fields) {
                 md += attachment.fields.map(field => {
                     return `**${field.title}**  \n${field.value}\n`;
-                });
+                }).join();
             }
-            md += '----\n';
-            md += attachment.footer ? `${attachment.footer.replace('\n', '  \n')}\n` : '';
-
+            md += '\n';
+            md += attachment.footer ? `----\n${attachment.footer.replace('\n', '  \n')}\n` : '';
             return md;
         }
         private renderChatpost(attachment: Slack.Attachement) {
@@ -173,7 +172,7 @@ namespace Notification {
             if (attachment.fields) {
                 chatpost += attachment.fields.map(field => {
                     return `# *${field.title}*\n${field.value}\n`;
-                });
+                }).join();
             }
             chatpost += attachment.title_link ? attachment.title_link : attachment.author_link ? attachment.author_link : '';
             chatpost += '\n';
