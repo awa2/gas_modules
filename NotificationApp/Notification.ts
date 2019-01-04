@@ -21,7 +21,8 @@ namespace Notification {
         }
         Email?: {
             to: string,
-            cc: string
+            cc?: string,
+            bcc?: string
         }
     }
     export class App {
@@ -37,11 +38,12 @@ namespace Notification {
             this.notifyToSlack(attachment);
         }
 
-        public notifyToEmail(attachment: Slack.Attachement, _to?: string, _cc?: string) {
+        public notifyToEmail(attachment: Slack.Attachement, _to?: string, _cc?: string, _bcc?: string) {
             if (this.option.Email) {
                 const emailOption = {
                     to: _to ? _to : this.option.Email.to,
                     cc: _cc ? _cc : this.option.Email.cc,
+                    bcc: _bcc ? _bcc : this.option.Email.bcc,
                     subject: attachment.title,
                     htmlBody: this.renderHTML(attachment),
                     noReply: true
@@ -167,7 +169,7 @@ namespace Notification {
         private renderChatpost(attachment: Slack.Attachement) {
             let chatpost = '';
 
-            chatpost += attachment.pretext ? `${attachment.pretext}\n` : '';
+            chatpost += attachment.pretext ? `${attachment.pretext}` : '';
             chatpost += `# *${attachment.title}* \n${attachment.text}\n`;
             if (attachment.fields) {
                 chatpost += attachment.fields.map(field => {
